@@ -60,29 +60,33 @@
           MessageBox('提示', '请输入用户名和密码');
           return;
         }
-
         const sha1 = crypto.createHash('sha1'), md5 = crypto.createHash('md5');
         sha1.update(this.password);
         const pwd = sha1.digest('hex');
+        const sjsd = {"sjs":(new Date)};
+        localStorage.setItem('cookxs', JSON.stringify(sjsd));
+        let user22 = JSON.parse(localStorage.getItem('cookxs'));
+        console.log(user22.sjs);
         md5.update(pwd);
         const password = md5.digest("hex");
 
         this.$http.post(
-          this.$api + "/yhcms/web/jcsj/login.do",
+          this.$api + "/yhcms/web/jcsj/loginxs.do",
           {
             "parameters": {
               "uaccounts": un,
               "upass": password
             },
             "foreEndType": 2,
-            "code": "300000045"
+            "code": "300000045",
+            "cookie":user22.sjs,
           }
         ).then(function (res) {
           Indicator.close();
           var result = JSON.parse(res.bodyText);
           if (result.success) {
-            const msg = {"user": name};
-            localStorage.setItem('login', JSON.stringify(msg));
+            const msg = {".": name,"time":(new Date).getMilliseconds()};
+            localStorage.setItem('loginxs', JSON.stringify(msg));
             Toast({
                 message: '登录成功',
                 position: 'bottom',

@@ -12,9 +12,6 @@
   .upload_btn{
     position: relative;
     input{
-      position: absolute;
-      top: 0;
-      left: 0;
       width: 100%;
       height: 100%;
       z-index: 99999;
@@ -23,7 +20,8 @@
   }
   .image_wrap {
     .img_demo{
-      margin-right: .2rem;
+      margin-right: .3rem;
+      margin-bottom: .3rem;
     }
   }
 </style>
@@ -33,7 +31,7 @@
       <div class="common_title">房源图</div>
       <div class="image_wrap clearfix mb140">
         <div v-if="fy < 8" class="upload_btn mr10 fl">
-            <input @change='add_img' id="file_add" tag="fy" type="file" multiple>
+            <input @change='add_img1' id="file_add" tag="fy" type="file" multiple>
         </div>
         <div class="img_demo fl pr" v-for='(item,index) in imgList' v-if="item.isdelete==0">
           <img class="upload_demo_img" :src="item.id==='xxx'? item.url : $prefix + '/' + item.url" alt="" />
@@ -43,7 +41,7 @@
       <div class="common_title">户型图</div>
       <div class="image_wrap clearfix mb140">
         <div v-if="hx < 1" class="upload_btn mr10 fl">
-            <input @change='add_img' id="file_add" tag="hx" type="file">
+            <input @change='add_img2' id="file_add" tag="hx" type="file">
         </div>
         <div class="img_demo fl pr" v-for='(item,index) in hxList' v-if="item.isdelete==0">
           <img class="upload_demo_img" :src="item.id==='xxx'? item.url : $prefix + '/' + item.url" alt="" />
@@ -53,7 +51,7 @@
       <div class="common_title">封面图</div>
       <div class="image_wrap clearfix mb140">
         <div v-if="fm < 1" class="upload_btn mr10 fl">
-            <input @change='add_img' id="file_add" tag="fm" type="file">
+            <input @change='add_img3' id="file_add" tag="fm" type="file">
         </div>
         <div class="img_demo fl pr" v-for='(item,index) in fmList' v-if="item.isdelete==0">
           <img class="upload_demo_img" :src="item.id==='xxx'? item.url : $prefix + '/' + item.url" alt="" />
@@ -75,6 +73,7 @@
         lpid: "",
         zdid: "",
         fyid: "",
+        house_id:'',
         imgList:[],
         hxList:[],
         gjList:[],
@@ -98,13 +97,30 @@
         }
         this[tag] -= 1;
       },
-      add_img(event){
+      /*图片上传压缩*/
+      add_img1(event){
         const images = event.target.files;
         let len = images.length;
         len = Math.min(len, 8 - this.fy);
         for(let i = 0; i < len; ++i){
             this.append_img(images[i]);
         }
+      },
+      add_img2(event){
+          const images = event.target.files;
+          let len = images.length;
+          len = Math.min(len, 8 - this.hx);
+          for(let i = 0; i < len; ++i){
+              this.append_img(images[i]);
+          }
+      },
+      add_img3(event){
+          const images = event.target.files;
+          let len = images.length;
+          len = Math.min(len, 8 - this.fm);
+          for(let i = 0; i < len; ++i){
+              this.append_img(images[i]);
+          }
       },
       append_img(image){
         var reader = new FileReader(), type = image.type;
@@ -122,7 +138,7 @@
               canvas.width = imgx.naturalWidth;
               canvas.height = imgx.naturalHeight;
               canvas.getContext("2d").drawImage(imgx, 0, 0);
-              ret = canvas.toDataURL(type, .5);
+              ret = canvas.toDataURL(type, .2);
 
               const obj = {
                   id: "xxx",
@@ -258,11 +274,13 @@
                 position: 'bottom',
                 duration: 1000
             });
-
-            let link = '/fang_list/'+this.lpid;
-            if(this.zdid){
-                link += '/' + this.zdid;
+            let link = '/fang_detail?house_id=';
+            if(this.fyid){
+                link += this.fyid;
             }
+            /*if(this.zdid){
+                link += '/' + this.zdid;
+            }*/
             setTimeout(function(){
                 that.$router.push({path:link});
             },1000);

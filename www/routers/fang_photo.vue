@@ -33,7 +33,7 @@
   margin-bottom: .08rem;
   border-radius: .1rem;
 }
-.supply_price{text-align:right}
+.supply_price{text-align:right;position: absolute;top: .7rem;}
 .supply_price > span{font-size:.4rem !important;color:#e01222;}
 .supply_price i{font-size:.23rem !important}
 .supply_tag dd{padding:.03rem !important}
@@ -94,9 +94,9 @@
                     <li class="price-sub" :class="{act:this.positionType=='a'}" @click="positionType='a';curTab=''">
                       <a href="javascript:void(0);" style="color: #302F35;">行政区域</a>
                     </li>
-                    <li class="price-sub" :class="{act:this.positionType=='y'}" @click="positionType='y';curTab=''">
+                    <!--<li class="price-sub" :class="{act:this.positionType=='y'}" @click="positionType='y';curTab=''">
                       <a href="javascript:void(0);" style="color: #302F35;">业务区域</a>
-                    </li>
+                    </li>-->
                     <li class="price-sub" :class="{act:this.positionType=='l'}" @click="positionType='l';curTab=''">
                       <a href="javascript:void(0);" style="color: #302F35;">地铁</a>
                     </li>
@@ -120,7 +120,7 @@
                           <a href="javascript:;">{{item.fdname}}</a></li>
                       </ul>
                     </div>
-
+                    <!--二级联动-->
                     <div id="third-tab" class="warpper2 box-flex1 bg-white" :class="{show:this.curTab!=''&&this.thirdpart!=''}">
                       <ul class="price-ul cut-height" :class="{show:this.positionType=='a'}">
                         <li v-for="item in subBuesiness" data-type="positionA"
@@ -141,7 +141,7 @@
                   </ul>
                 </div>
               </div>
-
+              <!--三级联动-->
               <div class="filt-open" id="filter-state" :class="{show:this.currentFilterTab=='state'}">
                 <div class="warpper box-flex1">
                   <ul class="box-flex1 bg-white cut-height">
@@ -176,13 +176,15 @@
                 </dt>
                 <dd class="supply_msg_box clearfix">
                   <dl>
-                    <dd class="supply_house">{{item.topic}}</dd>
-                    <dd class="supply_color ellipsis">{{item.district}}</dd>
+                    <dd v-if="item.zdh.indexOf('独栋') > -1" class="supply_house">{{item.topic}}&nbsp;&nbsp;{{item.fybh}}</dd>
+                    <dd v-else>{{item.topic}}&nbsp;&nbsp;{{item.zdh}} - {{item.fybh}}</dd>
+                    <dd v-if="item.district == ''" class="supply_color ellipsis">暂无数据</dd>
+                    <dd v-else class="supply_color ellipsis">{{item.district}}</dd>
                     <dd>
                       <dl class="supply_tag clearfix">
                         <dd class="tagClass">{{item.housing_area}}㎡</dd>
                         <dd class="tagClass">{{item.lc}}层</dd>
-                        <dd class="tagClass zc">{{item.decoration_level}}</dd>
+                        <dd class="tagClass zc" style="margin-top: 0.2em !important;padding-left: .5em !important;padding-right: .5em !important;margin-left: .5em !important;font-size: 0.22rem !important;">{{item.decoration_level}}</dd>
                       </dl>
                     </dd>
                   </dl>
@@ -255,6 +257,8 @@
       }
     },
     mounted(){
+      $("body").removeAttr("style");
+      $("html").removeAttr("style");
       this.init();
 
       //下滑时，条件tab固定
@@ -542,10 +546,10 @@
           Indicator.close();
           this_.loading = false;
           this_.resultData = this_.resultData.concat(result.data.data);
-          if (result.data.data < this_.para.items_perpage) {
+          if (result.data.data.buildings < this_.para.items_perpage) {
             this_.noMore = true;
           }
-          if (this_.resultData.length == 0) {
+          if (this_.resultData.length <= 0) {
             Toast({
               message: '抱歉,暂无符合条件的房源!',
               position: 'middle',

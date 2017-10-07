@@ -11,7 +11,7 @@
   .section{padding-bottom:1.2rem;padding-top:0 !important}
   .gift{padding-top:.3rem;width:100% !important}
   .weixin_bot .weixin_bot_box span{font-size:.27rem !important}
-  .photoedit{position:absolute;width:1.1rem;bottom:.18rem;right:.2rem;border: none;background-color: white;color: #0c0c0c;z-index: 999;border-radius: .2rem;}
+  .photoedit{position:absolute;width:1.4rem;bottom:.18rem;right:.2rem;border: none;background-color: white;color: #0c0c0c;z-index: 999;border-radius: .2rem;}
 </style>
 <template>
   <div>
@@ -23,21 +23,39 @@
           <div class="swiper-container">
             <div class="swiper-wrapper">
               <div class="swiper-slide" v-for="image in house_image">
-                <a href="javascript:;">
+                <a href="javascript:;" @click="enlarge">
                   <img v-if="image" :src="$prefix + '/' + image" alt="">
                   <img v-else :src="$prefix + '/upload/2017-08-27/6404b4de960b81fc5403c870aefcea34.png'" alt="">
                 </a>
+
               </div>
             </div>
             <div class="banner-page">
               <span class="pageState"><span id="picIndex">1</span>/{{house_image.length}}</span>
-              <span><mt-button type="primary" class="photoedit" @click.stop.prevent="upload">编辑</mt-button></span>
+              <span><mt-button type="primary" class="photoedit" @click.stop.prevent="upload">上传图片</mt-button></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--点击出现放大图片-->
+      <div v-show="large" class="large">
+        <div class="clear" @click="cancel">x</div>
+        <div style="clear: both;"></div>
+        <div class="swiper-container" style="position:relative !important;top:26.5%!important;">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide img" v-for="image in house_image">
+              <a href="javascript:;">
+                <img v-if="image" :src="$prefix + '/' + image" alt="">
+                <img v-else :src="$prefix + '/upload/2017-08-27/6404b4de960b81fc5403c870aefcea34.png'" alt="">
+              </a>
             </div>
           </div>
         </div>
       </div>
       <div class="build_price_wrap clearfix">
-        <span><i v-text="zdh" style="color:black"></i> - <i v-text="fybh" style="color:black"></i></span>
+       <!-- <span><i v-text="zdh" style="color:black"></i> - <i v-text="fybh" style="color:black"></i></span>-->
+        <span v-if="zdh.indexOf('独栋') > -1"><i v-text="fybh" style="color:black"></i></span>
+        <span v-else><i v-text="zdh" style="color:black"></i> - <i v-text="fybh" style="color:black"></i></span>
         <span><i v-text="monthly_price" style="color:#e01222"></i><i v-if="monthly_price != null" style="color:black">元/月</i></span>
         <span v-text="daily_price" style="color:#e01222"></span><i v-if="daily_price != null">元/㎡/天</i>
       </div>
@@ -78,8 +96,11 @@
         <a id="semwaploupanxiangqingdibu400" :href="'tel:' + phone" class="phone--tel-order">
           <img src="../resources/images/icons/phone-icon.png" class="mr05 mt-3">一键拨号</a>
       </div>
+
     </section>
+
     <!--context end-->
+
   </div>
 </template>
 
@@ -96,6 +117,7 @@
     components: {header1, footer1},
     data () {
       return {
+        large:false,
         hourse_id: "",
         daily_price:0, //日价格
         monthly_price:0, //月价格
@@ -154,11 +176,17 @@
               _this.workstation = data.krgw || '暂无数据';
               _this.floors = data.zglc || '暂无数据';
               _this.locat_floor = data.lc || '暂无数据';
-              _this.wyf = !data.wyf ? '暂无数据' : data.wyf + '元/㎡/月';
+             /* _this.wyf = !data.wyf ? '暂无数据' : data.wyf + '元/㎡/月';*/
+              if(result.data.wyf == 0){
+                  _this.wyf = '已包含';
+              }else{
+                  _this.wyf = !result.data.wyf ? '暂无数据' : result.data.wyf + '元/㎡/月'; //物业费
+              }
                 _this.zdh = data.zdh || '暂无数据';
               _this.fybh = data.fybh || '暂无数据';
               _this.wygs = data.wygs || '暂无数据';
-              _this.fjcg = data.fjcg || '暂无数据';
+              /*_this.fjcg = data.fjcg + "m" || '暂无数据';*/
+              _this.fjcg = !data.fjcg ? '暂无数据' : data.fjcg + "m";
               _this.fjzt = data.fjzt || '暂无数据';
               _this.name = data.name || '暂无数据';
               _this.phone = data.phone || '暂无数据';
@@ -169,7 +197,12 @@
               _this.chx = data.chx || '暂无数据';
               _this.kprq = data.kprq || '暂无数据';
               _this.chqxz = data.chqxz || '暂无数据';
-              _this.gnf= !data.gnf ? '暂无数据' : data.gnf + '元/㎡/季';
+              /*_this.gnf= !data.gnf ? '暂无数据' : data.gnf + '元/㎡/季';*/
+              if(result.data.gnf == 0){
+                  _this.gnf = '已包含';
+              }else{
+                  _this.gnf = !result.data.gnf ? '暂无数据' : result.data.gnf + '元/㎡/季';
+              }
               _this.tcf = !data.tcf ? '暂无数据' : data.tcf + '元/月';
               _this.wlgs = data.wlgs || '暂无数据';
               _this.lpdj = data.lpsort || '暂无数据';
@@ -196,6 +229,12 @@
             duration: 3000
           });
         });
+      },
+      cancel(){
+          this.large = false;
+      },
+      enlarge(){
+        this.large = true;
       },
       upload(){
           const that = this;

@@ -16,7 +16,7 @@
 .cell > dd {float:left;margin-right:.2rem}
 .supply_msg_box dd.supply_house{margin-top:.1rem !important}
 dd.supply_msg_box > dl > dd{padding-bottom:.13rem !important}
-  //遮罩内容
+  //遮罩内容1313131
   .float-part {
     position: fixed;
     left: 0;
